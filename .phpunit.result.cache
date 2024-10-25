@@ -1,0 +1,1 @@
+{"version":1,"defects":{"App\\Tests\\Controller\\ProviderApiControllerTest::testCreateProvider":7,"ProviderApiControllerTest::testCreateProvider":7},"times":{"App\\Tests\\Controller\\ProviderApiControllerTest::testCreateProvider":0.626,"ProviderApiControllerTest::testCreateProvider":0.348}}
