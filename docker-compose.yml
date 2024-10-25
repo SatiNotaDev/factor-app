@@ -1,31 +1,58 @@
-version: '3'
+version: '3.8'
 
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: symfony_app
-    ports:
-      - "8000:8000"
-    environment:
-      DATABASE_URL: mysql://root:password123@db:3306/factor_app?serverVersion=mariadb-10.6.18&charset=utf8mb4
-      REDIS_URL: redis://redis:6379
-    depends_on:
-      - db
-      - redis
+app:
+build:
+context: .
+dockerfile: Dockerfile
+container_name: symfony_app
+ports:
+- "8000:8000"
+environment:
+DATABASE_URL: mysql://root@db:3306/factor_app?serverVersion=mariadb-10.6.18&charset=utf8mb4
+REDIS_URL: redis://redis:6379
+APP_ENV: dev
+APP_SECRET: super_secret_key
+depends_on:
+- db
+- redis
+networks:
+- app_network
+volumes:
+- .:/app
+- /app/vendor
 
-  db:
-    image: mysql:5.7
-    container_name: mysql_db
-    environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: factor_app
-    ports:
-      - "3306:3306"
+db:
+image: mysql:5.7
+container_name: mysql_db
+environment:
+MYSQL_ROOT_PASSWORD: root_password
+MYSQL_DATABASE: factor_app
+MYSQL_USER: symfony_user
+MYSQL_PASSWORD: symfony_password
+ports:
+- "3306:3306"
+networks:
+- app_network
+volumes:
+- db_data:/var/lib/mysql
 
-  redis:
-    image: redis:latest
-    container_name: redis_cache
-    ports:
-      - "6379:6379"
+redis:
+image: redis
+container_name: redis_cache
+ports:
+- "6379:6379"
+networks:
+- app_network
+volumes:
+- redis_data:/data
+
+networks:
+app_network:
+driver: bridge
+
+volumes:
+db_data:
+driver: local
+redis_data:
+driver: local
